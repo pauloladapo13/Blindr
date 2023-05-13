@@ -11,7 +11,7 @@ cap.set(4,altocam)
 
 #creamos las función para extraer el texto
 def text(image):
-    #creamosla funciónpara reproducir la voz
+    #creamos la función para reproducir la voz
     def voz(archi_text,language,nom_archi):
         with open(archi_text, "r") as lec:
             lectura = lec.read()
@@ -19,11 +19,11 @@ def text(image):
         nombre = nom_archi
         lect.save(nombre)
 
-    pytesseract.pytesseract.tesseract_cmd = "/Users/pauloladapo/Desktop/BLINDR-1"
+    pytesseract.pytesseract.tesseract_cmd = r'd:\Users\Usuario\Desktop\HackUPC'
     gris = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     texto =pytesseract.image_to_string(gris)
     print(texto)
-    dire = open('Info.txt',"m")
+    dire = open('Info.txt',"w")
     dire.write(texto)
     dire.close()
     voz("Info.txt","en","Voz.mp3")
@@ -47,11 +47,11 @@ while True:
     doc = frame[y1:y2,x1:x2]
     cv2.imwrite("Imatext.jpg",doc)
     cv2.imshow("Lector Inteligente",frame)
-    t=cv2.waitKey(1)
+    t=cv2.waitKey(100)
 
-    if t == 27:
+    if t == 101:
         break
 
     text(doc)
     cap.release()
-    cv2.destroyAllWindows()    
+    cv2.destroyAllWindows()     
