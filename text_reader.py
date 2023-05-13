@@ -19,7 +19,7 @@ def text(image):
         nombre = nom_archi
         lect.save(nombre)
 
-    pytesseract.pytesseract.tesseract_cmd = r'd:\Users\Usuario\Desktop\HackUPC'
+    pytesseract.pytesseract.tesseract_cmd = "/Users/pauloladapo/Desktop/BLINDR-1"
     gris = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     texto =pytesseract.image_to_string(gris)
     print(texto)
