@@ -38,8 +38,8 @@ COLOURS = [
 ]
 
 
-model = torchvision.models.detection.maskrcnn_resnet50_fpn_v2(weights=weights)
-_ = model.eval()
+# model = torchvision.models.detection.maskrcnn_resnet50_fpn_v2(weights=weights)
+# _ = model.eval()
 
 
 #capture the images
@@ -83,7 +83,7 @@ def set_awb(url: str, awb: int=1):
 
 if __name__ == '__main__':
     set_resolution(URL_left, index=10)
-    set_resolution(URL_right, index=10)
+
 
     while True:
         if cap_left.isOpened():
@@ -109,49 +109,49 @@ if __name__ == '__main__':
             if cnt == 0:
                 cnt = 1
                 
-                det, lbls, scores, masks = get_detections(model,imgs)
-                if (len(det[1])==len(det[0])):
-                    det[1] = det[1][:-1]
-                sz1 = frame_r.shape[1]
-                centre = sz1/2
-                print(det)
-                print(np.array(weights.meta["categories"])[lbls[0]])
-                print(np.array(weights.meta["categories"])[lbls[1]])
-                cost = get_cost(det, lbls = lbls,sz1 = centre)
-                tracks = scipy.optimize.linear_sum_assignment(cost)
+                # det, lbls, scores, masks = get_detections(model,imgs)
+                # if (len(det[1])==len(det[0])):
+                #     det[1] = det[1][:-1]
+                # sz1 = frame_r.shape[1]
+                # centre = sz1/2
+                # print(det)
+                # print(np.array(weights.meta["categories"])[lbls[0]])
+                # print(np.array(weights.meta["categories"])[lbls[1]])
+                # cost = get_cost(det, lbls = lbls,sz1 = centre)
+                # tracks = scipy.optimize.linear_sum_assignment(cost)
 
-                dists_tl =  get_horiz_dist_corner_tl(det)
-                dists_br =  get_horiz_dist_corner_br(det)
+                # dists_tl =  get_horiz_dist_corner_tl(det)
+                # dists_br =  get_horiz_dist_corner_br(det)
 
-                final_dists = []
-                dctl = get_dist_to_centre_tl(det[0],cntr = centre)
-                dcbr = get_dist_to_centre_br(det[0], cntr = centre)
+                # final_dists = []
+                # dctl = get_dist_to_centre_tl(det[0],cntr = centre)
+                # dcbr = get_dist_to_centre_br(det[0], cntr = centre)
 
-                for i, j in zip(*tracks):
-                    if dctl[i] < dcbr[i]:
-                        final_dists.append((dists_tl[i][j],np.array(weights.meta["categories"])[lbls[0]][i]))
+                # for i, j in zip(*tracks):
+                #     if dctl[i] < dcbr[i]:
+                #         final_dists.append((dists_tl[i][j],np.array(weights.meta["categories"])[lbls[0]][i]))
 
-                    else:
-                        final_dists.append((dists_br[i][j],np.array(weights.meta["categories"])[lbls[0]][i]))
+                #     else:
+                #         final_dists.append((dists_br[i][j],np.array(weights.meta["categories"])[lbls[0]][i]))
                 
                 #final distances as list
-                fd = [i for (i,j) in final_dists]
-                #find distance away
-                dists_away = (7.05/2)*sz1*(1/tantheta)/np.array((fd))+fl
-                cat_dist = []
-                for i in range(len(dists_away)):
-                    cat_dist.append(f'{np.array(weights.meta["categories"])[lbls[0]][(tracks[0][i])]} {dists_away[i]:.1f}cm')
-                    print(f'{np.array(weights.meta["categories"])[lbls[0]][(tracks[0][i])]} is {dists_away[i]:.1f}cm away')
-                t1 = [list(tracks[1]), list(tracks[0])]
-                frames_ret = []
-                for i, imgi in enumerate(imgs):
-                    img = imgi.copy()
-                    deti = det[i].astype(np.int32)
-                    draw_detections(img,deti[list(tracks[i])], obj_order=list(t1[1]))
-                    annotate_class2(img,deti[list(tracks[i])],lbls[i][list(tracks[i])],cat_dist)
-                    frames_ret.append(img)
-                cv2.imshow("left_eye", cv2.cvtColor(frames_ret[0],cv2.COLOR_RGB2BGR))
-                cv2.imshow("right_eye", cv2.cvtColor(frames_ret[1],cv2.COLOR_RGB2BGR))
+                # fd = [i for (i,j) in final_dists]
+                # #find distance away
+                # dists_away = (7.05/2)*sz1*(1/tantheta)/np.array((fd))+fl
+                # cat_dist = []
+                # for i in range(len(dists_away)):
+                #     cat_dist.append(f'{np.array(weights.meta["categories"])[lbls[0]][(tracks[0][i])]} {dists_away[i]:.1f}cm')
+                #     print(f'{np.array(weights.meta["categories"])[lbls[0]][(tracks[0][i])]} is {dists_away[i]:.1f}cm away')
+                # t1 = [list(tracks[1]), list(tracks[0])]
+                # frames_ret = []
+                # for i, imgi in enumerate(imgs):
+                #     img = imgi.copy()
+                #     deti = det[i].astype(np.int32)
+                #     draw_detections(img,deti[list(tracks[i])], obj_order=list(t1[1]))
+                #     annotate_class2(img,deti[list(tracks[i])],lbls[i][list(tracks[i])],cat_dist)
+                #     frames_ret.append(img)
+                # cv2.imshow("left_eye", cv2.cvtColor(frames_ret[0],cv2.COLOR_RGB2BGR))
+                # cv2.imshow("right_eye", cv2.cvtColor(frames_ret[1],cv2.COLOR_RGB2BGR))
                 while True:
                     key1 = cv2.waitKey(1)
                     if key1 == ord('p'):

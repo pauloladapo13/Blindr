@@ -1,15 +1,12 @@
-import cv2 #procesamiento imagenes
-import pytesseract #interpretación palabras
-from gtts import gTTS #interpretar palabras para convertirlas en sonido
-from playsound import playsound #reproducir sonido
-
-cuadro=100
-anchocam,altocam=640,480
-cap=cv2.VideoCapture(0)
-cap.set(3,anchocam) #definimos un ancho y un alto definidos para siempre
-cap.set(4,altocam)
-
-#creamos las función para extraer el texto
+import pyttsx3
+import cv2
+import pytesseract
+from gtts import gTTS
+cuadro =100
+anchocam, altocam= 640,480
+cap= cv2.VideoCapture(0)
+cap.set(3, anchocam)
+cap.set(4, altocam)
 def text(image):
     #creamos la función para reproducir la voz
     def voz(archi_text,language,nom_archi):
@@ -19,17 +16,23 @@ def text(image):
         nombre = nom_archi
         lect.save(nombre)
 
-    pytesseract.pytesseract.tesseract_cmd = r'd:\Users\Usuario\Desktop\HackUPC'
+    
     gris = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    texto =pytesseract.image_to_string(gris)
-    print(texto)
-    dire = open('Info.txt',"w")
-    dire.write(texto)
-    dire.close()
-    voz("Info.txt","en","Voz.mp3")
-    audio = "Voz.mp3"
-    playsound(audio)
+    texto:str =pytesseract.image_to_string(gris, lang='eng')
 
+    hayTexto = texto.replace("\n","")
+    hayTexto = hayTexto.replace(" ","")
+    if not hayTexto: return
+    textoConvertido = texto.encode("utf-8","ignore").decode("utf-8")
+    print(textoConvertido)
+
+    engine = pyttsx3.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[17].id)
+
+    engine.say(textoConvertido)
+    engine.runAndWait()
+    
 
 
 #si ret está mal, es decir, la lectura de la cámara está mal hacemos un break
@@ -47,11 +50,12 @@ while True:
     doc = frame[y1:y2,x1:x2]
     cv2.imwrite("Imatext.jpg",doc)
     cv2.imshow("Lector Inteligente",frame)
-    t=cv2.waitKey(100)
+    t=cv2.waitKey(1)
 
-    if t == 101:
+    if t == 27:
         break
 
     text(doc)
-    cap.release()
-    cv2.destroyAllWindows()     
+    
+cap.release()
+cv2.destroyAllWindows()     
