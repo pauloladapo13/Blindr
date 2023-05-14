@@ -4,7 +4,9 @@
 # these colours are used to draw boxes.
 import copy
 import math
-
+import pyttsx3
+import cv2
+import pytesseract
 
 import numpy as np
 import cv2
@@ -187,9 +189,9 @@ def tlbr_to_area(boxes):
 
 
     
-#get all distances from every object box to every other object box
-#left image is boxes[0]
-#right image is boxes[1]
+# #get all distances from every object box to every other object box
+# left image is boxes[0]
+# right image is boxes[1]
 
 def get_horiz_dist_centre(boxes):
     pnts1 = np.array(tlbr_to_center1(boxes[0]))[:,0]
@@ -301,4 +303,53 @@ def annotate_class2(img, det, lbls,class_map, conf=None,  colours=COLOURS):
         
         ff = cv2.FONT_HERSHEY_PLAIN
         cv2.putText(img, txt, (tlx, tly-1+12), fontFace=ff, fontScale=1.0, color=(255,)*3)
+def readText():
+    URL_left = "http://10.5.236.68:8080/video"
+    cuadro =100
+    anchocam, altocam= 640,480
+    cap= cv2.VideoCapture(URL_left)
+    cap.set(3, anchocam)
+    cap.set(4, altocam)
+    def text(image):
+        #creamos la función para reproducir la voz
+        
 
+        
+        gris = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        texto:str =pytesseract.image_to_string(gris, lang='eng')
+
+        hayTexto = texto.replace("\n","")
+        hayTexto = hayTexto.replace(" ","")
+        if not hayTexto: return
+        textoConvertido = texto.encode("utf-8","ignore").decode("utf-8")
+        print(textoConvertido)
+
+        engine = pyttsx3.init()
+        voices = engine.getProperty('voices')
+        engine.setProperty('voice', voices[17].id)
+
+        engine.say(textoConvertido)
+        engine.runAndWait()
+        
+
+
+    #si ret está mal, es decir, la lectura de la cámara está mal hacemos un break
+    #rectángulo donde procesamos la información que esté en él
+    #cogemos los píxeles de nuestro cuadrado y los almacenamos y guardamos 
+    while True:
+        ret,frame =cap.read() #leemos la captura de vídeo y almacenamos los fps en frame
+        if ret == False:break
+        cv2.putText(frame, 'Coloque aquí el tecto que quiere leer', (158,80), cv2.FONT_HERSHEY_SIMPLEX, 0.71, (255,255,0),2)
+        cv2.putText(frame, 'Coloque aquí el tecto que quiere leer', (160,80), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0),2)
+        cv2.rectangle(frame,(cuadro,cuadro),(anchocam-cuadro,altocam-cuadro),(0,0,0),2)
+        x1,y1 =cuadro,cuadro #extraemos las coordenadas de la esquina superior izquierda
+        ancho,alto=(anchocam-cuadro)-x1,(altocam-cuadro)-y1
+        x2,y2=x1+ancho,y1+alto
+        doc = frame[y1:y2,x1:x2]
+        cv2.imwrite("Imatext.jpg",doc)
+        
+        
+
+        text(doc)
+        
+readText()

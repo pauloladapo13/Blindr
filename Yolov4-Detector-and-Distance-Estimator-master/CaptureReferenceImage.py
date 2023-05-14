@@ -1,7 +1,10 @@
 import cv2 as cv
 import time
 import requests
-
+import pyttsx3
+import cv2
+import pytesseract
+from gtts import gTTS
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
@@ -11,8 +14,9 @@ import torch
 import torchvision
 import torchvision.transforms.functional as tvtf
 from torchvision.models.detection import MaskRCNN_ResNet50_FPN_Weights,MaskRCNN_ResNet50_FPN_V2_Weights
-from stereo_image_utils import get_detections, get_cost, draw_detections, annotate_class2 
+from stereo_image_utils import get_detections, get_cost, draw_detections, annotate_class2
 from stereo_image_utils import get_horiz_dist_corner_tl, get_horiz_dist_corner_br, get_dist_to_centre_tl, get_dist_to_centre_br
+import time
 
 URL_left = "http://10.5.236.68:8080/video"
 URL_right = "http://10.5.236.68:8080/video"
@@ -95,17 +99,25 @@ def ObjectDetector(image):
         color = COLORS[int(classid) % len(COLORS)]
         label = "%s : %f" % (class_names[classid], score)
         cv.rectangle(image, box, color, 2)
+        
         cv.putText(frame, label, (box[0], box[1]-10), fonts, 0.5, color, 2)
+        
+       
+       
+        
+        
 
-        if classid ==0: # person class id 
-            data_list.append([class_names[classid], box[2], (box[0], box[1]-2)])
-        elif classid ==67:
-            data_list.append([class_names[classid], box[2], (box[0], box[1]-2)])
-        # if you want inclulde more classes then you have to simply add more [elif] statements here
-        # returning list containing the object data. 
-    return data_list
+def focal_length_finder (measured_distance, real_width, width_in_rf):
+    focal_length = (width_in_rf * measured_distance) / real_width
 
-camera = cv.VideoCapture(0)
+    return focal_length
+
+# distance finder function 
+def distance_finder(focal_length, real_object_width, width_in_frmae):
+    distance = (real_object_width * focal_length) / width_in_frmae
+    return distance
+
+camera = cv.VideoCapture(URL_left)
 set_resolution(camera, index=10)
 counter = 0
 capture = False

@@ -4,9 +4,9 @@ import cv2
 
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 # eye_cascade = cv2.CascadeClassifier("haarcascade_eye.xml")
-address = "http://10.5.238.23:8080/video"
-cap = cv2.VideoCapture(0)
-cap.open(address)
+URL_left = "http://10.5.236.68:8080/video"
+cap = cv2.VideoCapture(URL_left)
+cap.open(URL_left)
 while True: 
     check,frame = cap.read()
     gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
